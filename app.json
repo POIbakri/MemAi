@@ -1,0 +1,54 @@
+{
+  "expo": {
+    "name": "Memory Assistant",
+    "slug": "memory-assistant",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "memoryassistant",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/images/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "We need your location to track places you visit",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "We need background location access to track places you visit throughout the day",
+        "NSCalendarsUsageDescription": "We need access to your calendar to include events in your daily summaries",
+        "NSPhotoLibraryUsageDescription": "We need access to your photos to include them in your daily summaries"
+      }
+    },
+    "android": {
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_BACKGROUND_LOCATION",
+        "READ_CALENDAR",
+        "READ_EXTERNAL_STORAGE"
+      ],
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      }
+    },
+    "plugins": [
+      "expo-router",
+      "expo-location",
+      "expo-calendar",
+      "expo-media-library",
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow Memory Assistant to use your location to track places you visit."
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
