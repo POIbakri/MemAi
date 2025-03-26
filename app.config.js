@@ -1,77 +1,86 @@
 export default {
-  name: 'Memory Assistant',
-  slug: 'memory-assistant',
+  name: 'MemAi',
+  slug: 'memai',
   version: '1.0.0',
   orientation: 'portrait',
-  icon: './assets/images/icon.png',
-  scheme: 'memoryassistant',
-  userInterfaceStyle: 'automatic',
+  icon: './assets/icon.png',
+  userInterfaceStyle: 'light',
   splash: {
-    image: './assets/images/splash.png',
+    image: './assets/splash.png',
     resizeMode: 'contain',
-    backgroundColor: '#ffffff',
+    backgroundColor: '#ffffff'
   },
-  assetBundlePatterns: ['**/*'],
+  assetBundlePatterns: [
+    '**/*'
+  ],
   ios: {
     supportsTablet: true,
-    bundleIdentifier: 'com.memoryassistant.app',
-    buildNumber: '1',
+    bundleIdentifier: 'com.memai.app',
     infoPlist: {
-      NSLocationWhenInUseUsageDescription: 'We need your location to track places you visit',
-      NSLocationAlwaysAndWhenInUseUsageDescription:
-        'We need background location access to track places you visit throughout the day',
-      NSCalendarsUsageDescription: 'We need access to your calendar to include events in your daily summaries',
-      NSPhotoLibraryUsageDescription: 'We need access to your photos to include them in your daily summaries',
-      UIBackgroundModes: ['location', 'fetch'],
-    },
+      NSLocationWhenInUseUsageDescription: 'MemAi needs your location to help you remember where you were throughout your day.',
+      NSLocationAlwaysAndWhenInUseUsageDescription: 'MemAi needs your location to help you remember where you were throughout your day, even when the app is in the background.',
+      NSLocationAlwaysUsageDescription: 'MemAi needs your location to help you remember where you were throughout your day, even when the app is in the background.',
+      NSPhotoLibraryUsageDescription: 'MemAi needs access to your photos to help you remember moments from your day.',
+      NSCalendarsUsageDescription: 'MemAi needs access to your calendar to help you remember your events and schedule.',
+      NSCalendarsFullAccessUsageDescription: 'MemAi needs full access to your calendar to help you remember your events and schedule.',
+      NSLocationTemporaryUsageDescriptionDictionary: {
+        "BackgroundLocation": "MemAi needs your location to help you remember where you were throughout your day, even when the app is in the background."
+      },
+      NSCameraUsageDescription: "We need access to your camera to take photos for analysis.",
+      NSPhotoLibraryAddUsageDescription: "We need access to save photos to your library.",
+      NSMicrophoneUsageDescription: "We need access to your microphone for video recording.",
+      NSLocationUsageDescription: "We need your location to provide context about where your photos were taken.",
+    }
   },
   android: {
-    package: 'com.memoryassistant.app',
-    versionCode: 1,
     adaptiveIcon: {
-      foregroundImage: './assets/images/adaptive-icon.png',
-      backgroundColor: '#ffffff',
+      foregroundImage: './assets/adaptive-icon.png',
+      backgroundColor: '#ffffff'
     },
+    package: 'com.memai.app',
     permissions: [
-      'ACCESS_COARSE_LOCATION',
       'ACCESS_FINE_LOCATION',
+      'ACCESS_COARSE_LOCATION',
       'ACCESS_BACKGROUND_LOCATION',
-      'READ_CALENDAR',
       'READ_EXTERNAL_STORAGE',
       'WRITE_EXTERNAL_STORAGE',
+      'READ_CALENDAR',
+      'WRITE_CALENDAR',
       'CAMERA',
-      'NOTIFICATIONS',
-      'WAKE_LOCK',
-    ],
+    ]
   },
   plugins: [
-    'expo-router',
-    'expo-location',
-    'expo-calendar',
-    'expo-media-library',
     [
       'expo-location',
       {
-        locationAlwaysAndWhenInUsePermission:
-          'Allow Memory Assistant to use your location to track places you visit.',
+        locationAlwaysAndWhenInUsePermission: 'Allow MemAi to use your location to help you remember where you were throughout your day.',
+        locationAlwaysPermission: 'Allow MemAi to use your location to help you remember where you were throughout your day.',
+        locationWhenInUsePermission: 'Allow MemAi to use your location to help you remember where you were throughout your day.',
+        isIosBackgroundLocationEnabled: true,
+        isAndroidBackgroundLocationEnabled: true,
       },
     ],
+    [
+      'expo-media-library',
+      {
+        photosPermission: 'Allow MemAi to access your photos to help you remember moments from your day.',
+        savePhotosPermission: 'Allow MemAi to save photos to help you remember moments from your day.',
+        isAccessMediaLocationEnabled: true,
+      },
+    ],
+    [
+      'expo-calendar',
+      {
+        calendarPermission: 'Allow MemAi to access your calendar to help you remember your events and schedule.',
+      },
+    ],
+    'expo-camera',
+    'expo-image-picker',
+    'expo-av',
   ],
   extra: {
-    SUPABASE_URL: process.env.EXPO_PUBLIC_SUPABASE_URL,
-    SUPABASE_ANON_KEY: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY,
     eas: {
-      projectId: 'your-project-id', // Replace with your EAS project ID
-    },
-  },
-  experiments: {
-    typedRoutes: true,
-  },
-  updates: {
-    fallbackToCacheTimeout: 0,
-    url: 'https://u.expo.dev/your-project-id', // Replace with your project's update URL
-  },
-  runtimeVersion: {
-    policy: 'sdkVersion',
-  },
+      projectId: 'your-project-id'
+    }
+  }
 };

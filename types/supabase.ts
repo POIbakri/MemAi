@@ -18,6 +18,9 @@ export interface Database {
           background_logging: boolean
           notification_preferences: Json
           last_active_at: string | null
+          location_enabled: boolean
+          photo_sync_enabled: boolean
+          calendar_sync_enabled: boolean
         }
         Insert: {
           id: string
@@ -27,6 +30,9 @@ export interface Database {
           background_logging?: boolean
           notification_preferences?: Json
           last_active_at?: string | null
+          location_enabled?: boolean
+          photo_sync_enabled?: boolean
+          calendar_sync_enabled?: boolean
         }
         Update: {
           id?: string
@@ -36,6 +42,9 @@ export interface Database {
           background_logging?: boolean
           notification_preferences?: Json
           last_active_at?: string | null
+          location_enabled?: boolean
+          photo_sync_enabled?: boolean
+          calendar_sync_enabled?: boolean
         }
       }
       daily_logs: {

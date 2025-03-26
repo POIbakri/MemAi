@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { StyleSheet, View, Text, TextInput, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
 import { Link, router } from 'expo-router';
-import { supabase } from '@/lib/supabase';
+import { supabase, getSupabaseClient } from '@/lib/supabase';
 
 export default function SignUp() {
   const [email, setEmail] = useState('');
@@ -21,35 +21,55 @@ export default function SignUp() {
 
       // Check internet connectivity first
       try {
+        console.log('Checking network connectivity...');
         const response = await fetch('https://uuaagbaapwrqddrneffm.supabase.co/rest/v1/', {
           method: 'HEAD',
+          // Add a timeout to avoid long-hanging requests
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0',
+          },
         });
-        if (!response.ok) {
-          throw new Error('Network connectivity check failed');
+        console.log('Network response status:', response.status);
+        // 401 is expected for Supabase API when no auth token is provided
+        // We just need to ensure we can reach the server
+        if (response.status !== 200 && response.status !== 401) {
+          throw new Error(`Network connectivity check failed with status: ${response.status}`);
         }
       } catch (e) {
-        throw new Error('Unable to connect to the server. Please check your internet connection and try again.');
+        // Only throw network errors, not status code errors
+        if (e instanceof TypeError || (e instanceof Error && e.message.includes('Network request failed'))) {
+          console.error('Network connectivity error:', e);
+          throw new Error(`Unable to connect to the server. Please check your internet connection and try again.`);
+        }
       }
 
-      const { error: signUpError } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: window.location.origin,
-        },
-      });
+      try {
+        console.log('Getting Supabase client...');
+        const client = await getSupabaseClient();
+        
+        console.log('Attempting sign up...');
+        const { error: signUpError } = await client.auth.signUp({
+          email,
+          password,
+        });
 
-      if (signUpError) {
-        if (signUpError.message.includes('Network request failed')) {
-          throw new Error('Unable to connect to the server. Please check your internet connection and try again.');
+        if (signUpError) {
+          if (signUpError.message.includes('Network request failed')) {
+            throw new Error('Unable to connect to the server. Please check your internet connection and try again.');
+          }
+          if (signUpError.message.includes('User already registered')) {
+            throw new Error('An account with this email already exists. Please sign in instead.');
+          }
+          throw signUpError;
         }
-        if (signUpError.message.includes('User already registered')) {
-          throw new Error('An account with this email already exists. Please sign in instead.');
-        }
-        throw signUpError;
+
+        router.replace('/onboarding');
+      } catch (e) {
+        console.error('Supabase client or auth error:', e);
+        throw e;
       }
-
-      router.replace('/onboarding');
     } catch (e) {
       console.error('Sign up error:', e);
       setError(e instanceof Error ? e.message : 'An error occurred while creating your account');

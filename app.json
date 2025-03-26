@@ -19,6 +19,7 @@
         "NSLocationWhenInUseUsageDescription": "We need your location to track places you visit",
         "NSLocationAlwaysAndWhenInUseUsageDescription": "We need background location access to track places you visit throughout the day",
         "NSCalendarsUsageDescription": "We need access to your calendar to include events in your daily summaries",
+        "NSCalendarsFullAccessUsageDescription": "We need full access to your calendar to include events in your daily summaries",
         "NSPhotoLibraryUsageDescription": "We need access to your photos to include them in your daily summaries"
       }
     },

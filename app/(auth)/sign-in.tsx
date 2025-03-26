@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { StyleSheet, View, Text, TextInput, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
 import { Link, router } from 'expo-router';
-import { getSupabase } from '@/lib/supabase';
+import { auth } from '@/lib/supabase';
 
 export default function SignIn() {
   const [email, setEmail] = useState('');
@@ -19,27 +19,30 @@ export default function SignIn() {
       setLoading(true);
       setError(null);
 
-      const supabase = await getSupabase();
-      
-      const { error: signInError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+      console.log('Attempting sign in...');
+      const { data, error: signInError } = await auth.signInWithPassword(email, password);
 
       if (signInError) {
-        if (signInError.message.includes('Network request failed')) {
-          throw new Error('Unable to connect to the server. Please check your internet connection and try again.');
-        }
+        console.error('Sign in error:', signInError);
         if (signInError.message.includes('Invalid login credentials')) {
-          throw new Error('Invalid email or password. Please try again.');
+          setError('Invalid email or password. Please try again.');
+        } else if (signInError.message.includes('Network request failed')) {
+          setError('Unable to connect to the server. Please check your internet connection.');
+        } else {
+          setError(signInError.message);
         }
-        throw signInError;
+        return;
       }
-      
-      router.replace('/(app)');
+
+      if (data?.user) {
+        console.log('Sign in successful, user:', data.user.id);
+        router.replace('/');
+      } else {
+        setError('Sign in successful but no user data received');
+      }
     } catch (e) {
-      console.error('Sign in error:', e);
-      setError(e instanceof Error ? e.message : 'An error occurred while signing in');
+      console.error('Unexpected error during sign in:', e);
+      setError('An unexpected error occurred. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -93,13 +96,14 @@ export default function SignIn() {
             )}
           </TouchableOpacity>
 
-          <Link href="/sign-up" asChild>
-            <TouchableOpacity style={styles.linkButton} disabled={loading}>
-              <Text style={styles.linkText}>
-                Don't have an account? Sign up
-              </Text>
-            </TouchableOpacity>
-          </Link>
+          <View style={styles.footer}>
+            <Text style={styles.footerText}>Don't have an account? </Text>
+            <Link href="/sign-up" asChild>
+              <TouchableOpacity>
+                <Text style={styles.footerLink}>Sign Up</Text>
+              </TouchableOpacity>
+            </Link>
+          </View>
         </View>
       </View>
     </View>
@@ -109,81 +113,88 @@ export default function SignIn() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#000',
   },
   backgroundImage: {
     position: 'absolute',
     width: '100%',
     height: '100%',
+    opacity: 0.5,
   },
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.4)',
-    justifyContent: 'flex-end',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    padding: 20,
   },
   content: {
-    backgroundColor: '#fff',
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    padding: 24,
-    gap: 16,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    borderRadius: 20,
+    padding: 30,
+    alignItems: 'center',
   },
   title: {
     fontSize: 32,
-    fontFamily: 'Inter_700Bold',
-    color: '#000',
-    marginBottom: 8,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 10,
   },
   subtitle: {
     fontSize: 16,
-    color: '#666',
-    marginBottom: 24,
-    fontFamily: 'Inter_400Regular',
-  },
-  errorContainer: {
-    backgroundColor: '#fee2e2',
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 8,
-  },
-  errorText: {
-    color: '#dc2626',
-    fontSize: 14,
-    fontFamily: 'Inter_400Regular',
+    color: '#fff',
+    marginBottom: 30,
+    opacity: 0.8,
   },
   input: {
-    height: 48,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    paddingHorizontal: 16,
+    width: '100%',
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    borderRadius: 10,
+    padding: 15,
+    marginBottom: 15,
+    color: '#fff',
     fontSize: 16,
-    backgroundColor: '#fff',
-    fontFamily: 'Inter_400Regular',
   },
   button: {
-    height: 48,
-    backgroundColor: '#000',
-    borderRadius: 8,
-    justifyContent: 'center',
+    width: '100%',
+    backgroundColor: '#007AFF',
+    borderRadius: 10,
+    padding: 15,
     alignItems: 'center',
-    marginTop: 8,
+    marginTop: 10,
   },
   buttonDisabled: {
-    opacity: 0.5,
+    opacity: 0.7,
   },
   buttonText: {
     color: '#fff',
     fontSize: 16,
-    fontFamily: 'Inter_600SemiBold',
+    fontWeight: 'bold',
   },
-  linkButton: {
-    alignItems: 'center',
-    padding: 16,
+  errorContainer: {
+    backgroundColor: 'rgba(255,0,0,0.1)',
+    borderRadius: 10,
+    padding: 15,
+    marginBottom: 20,
+    width: '100%',
   },
-  linkText: {
-    color: '#000',
+  errorText: {
+    color: '#ff4444',
+    textAlign: 'center',
     fontSize: 14,
-    fontFamily: 'Inter_400Regular',
+  },
+  footer: {
+    flexDirection: 'row',
+    marginTop: 20,
+    alignItems: 'center',
+  },
+  footerText: {
+    color: '#fff',
+    fontSize: 14,
+    opacity: 0.8,
+  },
+  footerLink: {
+    color: '#007AFF',
+    fontSize: 14,
+    fontWeight: 'bold',
   },
 });

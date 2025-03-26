@@ -23,7 +23,7 @@ export default function AppLayout() {
       }}
     >
       <Tabs.Screen
-        name="chat"
+        name="(app)/chat"
         options={{
           title: 'Memory',
           tabBarIcon: ({ color, size }) => (
@@ -32,7 +32,7 @@ export default function AppLayout() {
         }}
       />
       <Tabs.Screen
-        name="settings"
+        name="(app)/settings"
         options={{
           title: 'Settings',
           tabBarIcon: ({ color, size }) => (
